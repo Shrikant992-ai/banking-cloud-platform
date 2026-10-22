@@ -5,3 +5,7 @@
 *.tfvars
 crash.log
 *.swp
+
+# Python
+__pycache__/
+*.pyc
