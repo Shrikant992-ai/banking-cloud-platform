@@ -31,6 +31,17 @@ pipeline {
                 sh 'terraform fmt -check -recursive terraform'
             }
         }
+
+        stage('Test services') {
+            steps {
+                sh '''
+                    for d in services/*/; do
+                        echo "Testing $d"
+                        (cd "$d" && python3 -m unittest -v)
+                    done
+                '''
+            }
+        }
     }
 
     post {
