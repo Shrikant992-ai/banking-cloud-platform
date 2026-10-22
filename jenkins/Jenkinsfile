@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    options {
+        timeout(time: 10, unit: 'MINUTES')
+    }
+
+    stages {
+        stage('Check Bash scripts') {
+            steps {
+                sh '''
+                    for f in scripts/*.sh; do
+                        bash -n "$f" && echo "OK: $f"
+                    done
+                '''
+            }
+        }
+
+        stage('Check IAM policy files') {
+            steps {
+                sh '''
+                    for f in iam/policies/*.json; do
+                        jq empty "$f" && echo "OK: $f"
+                    done
+                '''
+            }
+        }
+
+        stage('Check Terraform format') {
+            steps {
+                sh 'terraform fmt -check -recursive terraform'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'All checks passed'
+        }
+        failure {
+            echo 'A check failed. Open the stage that is red.'
+        }
+    }
+}
